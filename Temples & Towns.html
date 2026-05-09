@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1280"/>
+<title>Temples & Towns — Stays in Pondicherry & Bengaluru</title>
+<link rel="stylesheet" href="styles.css"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="data.js"></script>
+<script type="text/babel" src="components/shell.jsx"></script>
+<script type="text/babel" src="components/home.jsx"></script>
+<script type="text/babel" src="components/search.jsx"></script>
+<script type="text/babel" src="components/booking.jsx"></script>
+<script type="text/babel" src="components/account.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentHue": 202,
+  "showHeroGlow": true,
+  "imageStyle": "stripes",
+  "buttonShape": "pill",
+  "density": "comfortable"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [screen, setScreen] = useState('home');
+  const [params, setParams] = useState({});
+  const [searchCtx, setSearchCtx] = useState({ city: 'Pondicherry', checkIn: '2026-05-12', checkOut: '2026-05-15', guests: '2 guests · 1 room' });
+  const [user, setUser] = useState(null);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [pendingBookCtx, setPendingBookCtx] = useState(null);
+  const [activeBooking, setActiveBooking] = useState(null);
+  const [bookings, setBookings] = useState(TT_DATA.initialBookings);
+
+  // Apply tweaks to root css vars
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--accent', `oklch(0.58 0.16 ${tweaks.accentHue})`);
+    root.style.setProperty('--accent-deep', `oklch(0.34 0.13 ${tweaks.accentHue})`);
+    root.style.setProperty('--accent-soft', `oklch(0.96 0.04 ${tweaks.accentHue})`);
+    root.style.setProperty('--pill', tweaks.buttonShape === 'pill' ? '980px' : '12px');
+  }, [tweaks]);
+
+  const go = (s, p = {}) => {
+    setScreen(s); setParams(p); window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const openSignIn = () => setShowSignIn(true);
+  const onSignIn = (u) => { setUser(u); setShowSignIn(false);
+    if (pendingBookCtx) { go('book'); }
+  };
+
+  const startBooking = ({ property, room }) => {
+    setPendingBookCtx({ property, room, ...searchCtx });
+    go('book');
+  };
+
+  const submitBookingRequest = (ctx) => {
+    const id = 'BK-' + Math.floor(7000 + Math.random()*1000);
+    const newBooking = {
+      id,
+      property: ctx.property,
+      room: ctx.room,
+      checkIn: ctx.checkIn,
+      checkOut: ctx.checkOut,
+      guests: ctx.guests,
+      total: ctx.total,
+      form: ctx.form,
+      status: 'PENDING_APPROVAL',
+    };
+    setActiveBooking(newBooking);
+    go('flow');
+  };
+
+  const advance = (status) => {
+    setActiveBooking(b => {
+      const next = { ...b, status };
+      if (status === 'CONFIRMED') {
+        // add to bookings list
+        setBookings(prev => [{
+          id: next.id,
+          property: next.property.name,
+          city: next.property.city === 'pondicherry' ? 'Pondicherry' : 'Bengaluru',
+          room: next.room.type,
+          checkIn: next.checkIn,
+          checkOut: next.checkOut,
+          nights: tt.nightsBetween(next.checkIn, next.checkOut),
+          guests: 2,
+          total: next.total,
+          status: 'CONFIRMED',
+        }, ...prev]);
+      }
+      return next;
+    });
+  };
+
+  return (
+    <>
+      <UtilityBar go={go}/>
+      <Navbar screen={screen} go={go} user={user} openSignIn={openSignIn} />
+      <main>
+        {screen === 'home' && <HomeScreen go={go} setSearchCtx={setSearchCtx}/>}
+        {screen === 'search' && <SearchScreen go={go} searchCtx={searchCtx}/>}
+        {screen === 'property' && <PropertyScreen go={go} params={params} searchCtx={searchCtx} user={user} openSignIn={openSignIn} startBooking={startBooking}/>}
+        {screen === 'book' && pendingBookCtx && <BookingWizard go={go} ctx={{...pendingBookCtx, ...searchCtx}} onSubmit={submitBookingRequest}/>}
+        {screen === 'flow' && activeBooking && <BookingFlow go={go} booking={activeBooking} advance={advance}/>}
+        {screen === 'bookings' && <BookingsScreen go={go} bookings={bookings}/>}
+        {screen === 'loyalty' && <LoyaltyScreen go={go} user={user} bookings={bookings}/>}
+        {screen === 'cause' && <CauseScreen go={go}/>}
+        {screen === 'folio' && <FolioScreen go={go} user={user} bookings={bookings}/>}
+        {screen === 'experience' && <ExperienceScreen go={go}/>}
+        {screen === 'things' && <ThingsScreen go={go}/>}
+        {screen === 'events' && <EventsScreen go={go}/>}
+      </main>
+      <Footer/>
+
+
+      {showSignIn && <SignInModal onClose={() => setShowSignIn(false)} onSignIn={onSignIn}/>}
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Color">
+          <TweakSlider label="Accent hue" min={180} max={280} value={tweaks.accentHue} onChange={v => setTweak('accentHue', v)} />
+        </TweakSection>
+        <TweakSection title="Shape">
+          <TweakRadio label="Buttons" value={tweaks.buttonShape} onChange={v => setTweak('buttonShape', v)}
+            options={[{value:'pill', label:'Pill'},{value:'rounded', label:'Rounded'}]}/>
+        </TweakSection>
+        <TweakSection title="Quick demo">
+          <TweakButton onClick={() => { setUser({firstName:'Aarav', lastName:'Menon', email:'aarav@example.com'}); }}>Sign in as demo user</TweakButton>
+          <TweakButton onClick={() => {
+            // Jump straight to confirmation with demo booking
+            const property = TT_DATA.properties[0];
+            const room = TT_DATA.rooms.p1[1];
+            const demo = {
+              id: 'BK-7900',
+              property, room,
+              checkIn: '2026-05-12', checkOut: '2026-05-15',
+              guests: '2 guests · 1 room',
+              total: 35400,
+              form: { firstName:'Aarav', lastName:'Menon', email:'aarav@example.com' },
+              status: 'APPROVED',
+            };
+            setActiveBooking(demo); go('flow');
+          }}>Jump to payment screen</TweakButton>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#0071e3"/>
+  <path d="M50 28 L72 72 L28 72 Z" fill="#fff" opacity="0.95"/>
+  <circle cx="50" cy="58" r="6" fill="#0071e3"/>
+</svg>
+</template>
+</body>
+</html>

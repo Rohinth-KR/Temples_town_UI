@@ -1,0 +1,12 @@
+# Reference / design assets (large files)
+uploads/
+export/
+scraps/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
