@@ -20,12 +20,12 @@ const BookingsScreen = ({ go, bookings }) => {
         {list.map(b => (
           <div key={b.id} className="tt-card" style={{ display: 'flex', flexDirection: 'row', cursor: 'pointer' }} onClick={() => go('flow', { bookingId: b.id })}>
             <div style={{ flex: '0 0 220px', position: 'relative' }}>
-              <StripeImg label={b.property.placeholder} tone={b.property.tone} ratio="auto"/>
+              <StripeImg label={b.property} tone="oklch(0.88 0.04 230)" ratio="auto"/>
             </div>
             <div style={{ flex: 1, padding: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div className="tt-eyebrow" style={{ fontSize: 11 }}>{b.id}</div>
-                <h3 className="tt-h3" style={{ marginTop: 6, marginBottom: 6 }}>{b.property.name}</h3>
+                <h3 className="tt-h3" style={{ marginTop: 6, marginBottom: 6 }}>{b.property}</h3>
                 <div className="tt-muted" style={{ fontSize: 14 }}>{tt.fmtDate(b.checkIn)} → {tt.fmtDate(b.checkOut)} · {b.guests}</div>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 12, fontWeight: 600, color: stateMeta[b.state][1] }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: stateMeta[b.state][1] }}/>
@@ -55,7 +55,7 @@ const LoyaltyScreen = ({ go, user, bookings }) => {
   return (
     <div className="tt-page" style={{ paddingTop: 56, paddingBottom: 96 }}>
       <div className="tt-eyebrow">Wayfarer Rewards</div>
-      <h1 className="tt-h1" style={{ margin: '12px 0 0' }}>Welcome back, <span className="tt-italic-soft" style={{ color: 'var(--accent)' }}>{user?.name?.split(' ')[0] || 'traveller'}</span></h1>
+      <h1 className="tt-h1" style={{ margin: '12px 0 0' }}>Welcome back, <span className="tt-italic-soft" style={{ color: 'var(--accent)' }}>{user?.firstName || 'traveller'}</span></h1>
       <div style={{ background: '#0a1628', color: '#fff', borderRadius: 6, padding: 40, marginTop: 32, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
         <div>
           <div style={{ fontSize: 13, opacity: 0.7, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Current tier</div>
@@ -234,3 +234,4 @@ const EventsScreen = ({ go }) => <ListPage eyebrow="Events &amp; festivals" titl
   {cat:'Auroville · 5 Jun',t:'Solstice sound bath',d:'Outdoor, bring a blanket.',price:'Free',label:'sound',tone:'oklch(0.87 0.05 200)'},
 ]}/>;
 window.EventsScreen = EventsScreen;
+

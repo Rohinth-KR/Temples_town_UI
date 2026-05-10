@@ -126,7 +126,7 @@ const BookingFlow = ({ go, booking, advance }) => {
   const [paying, setPaying] = useState(false);
   useEffect(() => {
     if (booking.state !== 'awaiting') return;
-    const t = setTimeout(() => advance(booking.id, 'approved'), 6500);
+    const t = setTimeout(() => advance('approved'), 6500);
     return () => clearTimeout(t);
   }, [booking.id, booking.state, advance]);
 
@@ -203,7 +203,7 @@ const BookingFlow = ({ go, booking, advance }) => {
               <div className="tt-field"><label>Expiry</label><input defaultValue="04 / 28" disabled={paying}/></div>
               <div className="tt-field"><label>CVV</label><input defaultValue="•••" disabled={paying}/></div>
             </div>
-            <button className="tt-btn tt-btn-primary tt-w-full tt-btn-lg" style={{ marginTop: 20 }} disabled={paying} onClick={() => { setPaying(true); setTimeout(() => { setShowPay(false); setPaying(false); advance(booking.id, 'confirmed'); }, 1800); }}>
+            <button className="tt-btn tt-btn-primary tt-w-full tt-btn-lg" style={{ marginTop: 20 }} disabled={paying} onClick={() => { setPaying(true); setTimeout(() => { setShowPay(false); setPaying(false); advance('confirmed'); }, 1800); }}>
               {paying ? 'Processing…' : `Pay ${tt.inr(booking.total)}`}
             </button>
           </div>

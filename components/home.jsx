@@ -1,4 +1,4 @@
-/* global React, Ico, StripeImg, Reveal, tt, TT_DATA */
+/* global React, Ico, StripeImg, tt, TT_DATA */
 const { useState, useMemo } = React;
 
 // ---------- HOME ----------
@@ -33,7 +33,7 @@ const HomeScreen = ({ go, setSearchCtx }) => {
 
             {/* RIGHT — shorter featured photo card, no search inside */}
             <div className="tt-featured-card" style={{ aspectRatio: 'unset', height: 280 }}>
-              <StripeImg label="resort" tone="oklch(0.7 0.06 230)" ratio="auto"/>
+              <img src="images/hero_resort.png" alt="Featured Resort" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,22,40,0.35) 0%, rgba(10,22,40,0.05) 40%, rgba(10,22,40,0.55) 100%)', zIndex: 2 }}/>
               <span className="tt-featured-label">Featured</span>
               <span className="tt-featured-meta">New destinations weekly</span>
@@ -112,7 +112,7 @@ const HomeScreen = ({ go, setSearchCtx }) => {
               {label:'banyan-tree',      cap:'Banyan, Lalbagh'},
             ].map(m => (
               <div key={m.label} className="tt-moment">
-                <StripeImg label={m.label} tone="oklch(0.78 0.05 215)" ratio="auto"/>
+                <img src={`images/${m.label}.png`} alt={m.cap} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.45) 100%)', zIndex: 1 }}/>
                 <span className="tt-moment-cap">{m.cap}</span>
               </div>
@@ -140,7 +140,7 @@ const HomeScreen = ({ go, setSearchCtx }) => {
                 {cat:'Nature', title:'Kerala backwaters',   loc:'Kerala',   label:'nature'},
               ].map(j => (
                 <div key={j.title} className="tt-journey">
-                  <StripeImg label={j.label} tone="oklch(0.6 0.08 230)" ratio="auto"/>
+                  <img src={`images/${j.label}.png`} alt={j.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.7) 100%)', zIndex: 1 }}/>
                   <span className="tt-journey-cat">{j.cat}</span>
                   <div className="tt-journey-body">
@@ -169,7 +169,7 @@ const HomeScreen = ({ go, setSearchCtx }) => {
             {TT_DATA.properties.slice(0, 3).map(p => (
               <div key={p.id} className="tt-card" onClick={() => go('property', { propertyId: p.id })}>
                 <div className="tt-card-media">
-                  <StripeImg label={p.placeholder} tone={p.tone} ratio="auto"/>
+                  <img src={`images/${p.id}.png`} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   <div className="tt-card-tags">
                     <span className="tt-tag">{p.city === 'pondicherry' ? 'Pondicherry' : 'Bengaluru'}</span>
                     <span className="tt-tag tt-tag-dark">★ {p.rating}</span>

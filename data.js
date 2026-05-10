@@ -131,7 +131,7 @@ window.TT_DATA = {
       nights: 3,
       guests: 2,
       total: 38400,
-      status: 'CONFIRMED',
+      state: 'confirmed',
     },
     {
       id: 'BK-7298',
@@ -143,7 +143,7 @@ window.TT_DATA = {
       nights: 2,
       guests: 2,
       total: 14800,
-      status: 'COMPLETED',
+      state: 'completed',
     },
   ],
 };

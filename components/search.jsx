@@ -1,4 +1,4 @@
-/* global React, Ico, StripeImg, Reveal, tt, TT_DATA */
+/* global React, Ico, StripeImg, tt, TT_DATA */
 const { useState, useMemo } = React;
 
 // ---------- SEARCH ----------

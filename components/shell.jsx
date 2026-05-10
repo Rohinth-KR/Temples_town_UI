@@ -101,11 +101,7 @@ const StripeImg = ({ tone, label, ratio }) => {
 };
 window.StripeImg = StripeImg;
 
-// ---------- Reveal (no-op, content immediate) ----------
-const Reveal = ({ children, className = '', as: As = 'div', style }) => (
-  <As className={`tt-reveal in ${className}`} style={style}>{children}</As>
-);
-window.Reveal = Reveal;
+
 
 // ---------- formatters ----------
 const inr = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
@@ -126,18 +122,10 @@ const nightsBetween = (a, b) => {
 };
 window.tt = { inr, fmtDate, fmtDateLong, nightsBetween };
 
-// ---------- Logo mark — recreates the TT monogram from reference ----------
-const LogoMark = () => (
-  <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none" stroke="#3a3cc7" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-      {/* Left T */}
-      <path d="M10 14 H30 M20 14 V46" />
-      {/* Right T overlapped */}
-      <path d="M28 18 H50 M40 18 V42 Q40 50 32 50" />
-      {/* small flourish */}
-      <circle cx="46" cy="44" r="2.6" fill="#3a3cc7" stroke="none"/>
-    </g>
-  </svg>
+// ---------- Logo mark — client logo image ----------
+const LogoMark = ({ size }) => (
+  <img src="logo.png" alt="Temples & Towns" draggable={false}
+       style={{ width: size || '100%', height: size || '100%', objectFit: 'contain' }} />
 );
 window.LogoMark = LogoMark;
 
@@ -153,7 +141,6 @@ const UtilityBar = ({ go }) => (
       <div className="tt-utility-right">
         <a onClick={() => go('search')}>Trip Planner</a>
         <a onClick={() => go('events')}>Events</a>
-        <a onClick={() => go('folio')}>Guest folio</a>
       </div>
     </div>
   </div>
@@ -174,10 +161,7 @@ const Navbar = ({ screen, go, user, openSignIn }) => {
       <div className="tt-nav-inner">
         <div className="tt-logo" onClick={() => go('home')}>
           <div className="tt-logo-mark"><LogoMark/></div>
-          <div className="tt-logo-text">
-            <span className="l1">Temple and Towns</span>
-            <span className="l2">Resorts</span>
-          </div>
+          <img src="logo_name.png" alt="Temple and Towns Resorts" className="tt-logo-name" />
         </div>
         <div className="tt-nav-links">
           {links.map(l => (
@@ -207,10 +191,7 @@ const Footer = () => (
         <div>
           <div className="tt-logo" style={{ marginBottom: 18 }}>
             <div className="tt-logo-mark" style={{ width: 38, height: 38 }}><LogoMark/></div>
-            <div className="tt-logo-text">
-              <span className="l1">Temple and Towns</span>
-              <span className="l2">Resorts</span>
-            </div>
+            <img src="logo_name.png" alt="Temple and Towns Resorts" className="tt-logo-name" />
           </div>
           <p style={{ color: 'var(--text-soft)', fontSize: 14, maxWidth: 340, lineHeight: 1.6, margin: 0 }}>
             Modern, calm, unmistakably Indian. A small, hand-picked collection of stays across temple towns and quiet coastlines — designed to feel premium without feeling heavy.

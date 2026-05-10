@@ -22,12 +22,192 @@
 <script type="text/babel">
 const { useState, useEffect } = React;
 
+// ---------- SIGN IN MODAL ----------
+const SIGNIN_STYLE = `
+  .si-backdrop { position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center; }
+  .si-overlay  { position:absolute;inset:0;background:rgba(10,22,40,.52);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px); }
+  .si-card {
+    position:relative;background:#fff;width:100%;max-width:420px;
+    border-radius:10px;padding:44px 44px 36px;
+    box-shadow:0 32px 80px -20px rgba(10,22,40,.28),0 0 0 .5px rgba(10,22,40,.08);
+    animation:si-rise .35s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes si-rise { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:none} }
+
+  .si-close {
+    position:absolute;top:16px;right:16px;
+    width:32px;height:32px;border-radius:50%;border:none;background:transparent;
+    color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background .18s,color .18s;
+  }
+  .si-close:hover { background:var(--bg-soft);color:var(--ink); }
+
+  .si-head { text-align:center;margin-bottom:32px; }
+  .si-head h2 { margin:0;font-size:26px;font-weight:700;letter-spacing:-.025em;color:var(--ink); }
+  .si-head p  { margin:8px 0 0;font-size:14px;color:var(--text-muted);line-height:1.55; }
+
+  /* ── floating-label field ── */
+  .si-field { position:relative;margin-bottom:0; }
+  .si-field input {
+    width:100%;height:56px;padding:20px 14px 8px 44px;
+    border:1.5px solid var(--line-strong);border-radius:7px;
+    background:#fff;font-size:15px;font-weight:400;color:var(--ink);
+    outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box;
+    -webkit-appearance:none;
+  }
+  .si-field input::placeholder { color:transparent; }
+  .si-field input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,76,224,.12); }
+  .si-field label {
+    position:absolute;left:44px;top:50%;transform:translateY(-50%);
+    font-size:14px;font-weight:400;color:var(--text-muted);
+    pointer-events:none;transition:top .18s,font-size .18s,color .18s,transform .18s;
+    white-space:nowrap;
+  }
+  /* floated state — when input has value OR is focused */
+  .si-field input:focus ~ label,
+  .si-field input:not(:placeholder-shown) ~ label {
+    top:10px;transform:translateY(0);font-size:10.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent);font-weight:500;
+  }
+  .si-field-ico {
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
+    color:var(--text-faint);pointer-events:none;transition:color .18s;
+  }
+  .si-field input:focus ~ .si-field-ico { color:var(--accent); }
+
+  /* password show/hide toggle */
+  .si-eye {
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    background:none;border:none;cursor:pointer;padding:4px;
+    color:var(--text-muted);line-height:1;transition:color .18s;
+  }
+  .si-eye:hover { color:var(--ink); }
+
+  /* ── sign-in button ── */
+  .si-submit {
+    width:100%;height:52px;border:none;border-radius:7px;margin-top:4px;
+    background:var(--ink);color:#fff;
+    font-size:15px;font-weight:600;letter-spacing:-.01em;
+    cursor:pointer;transition:background .22s,transform .14s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .si-submit:hover { background:var(--accent); }
+  .si-submit:active { transform:scale(.985); }
+
+  /* ── divider ── */
+  .si-or {
+    display:flex;align-items:center;gap:12px;
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);
+  }
+  .si-or::before,.si-or::after { content:'';flex:1;height:1px;background:var(--line); }
+
+  /* ── footer ── */
+  .si-foot { text-align:center;font-size:14px;color:var(--text-soft);margin-top:20px; }
+  .si-foot a { color:var(--ink);font-weight:600;text-decoration:none; }
+  .si-foot a:hover { color:var(--accent); }
+  .si-trust {
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    margin-top:20px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--text-faint);
+  }
+`;
+
+const SignInModal = ({ onClose, onSignIn }) => {
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw]     = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSignIn({ firstName: 'Aarav', lastName: 'Menon', email: email || 'aarav@example.com' });
+  };
+
+  return (
+    <div className="si-backdrop">
+      <style>{SIGNIN_STYLE}</style>
+      <div className="si-overlay" onClick={onClose} />
+
+      <div className="si-card">
+        <button className="si-close" aria-label="Close" onClick={onClose}>
+          <Ico name="x" size={16}/>
+        </button>
+
+        <div className="si-head">
+          <div className="tt-logo-mark" style={{ width:38, height:38, margin:'0 auto 14px' }}><LogoMark/></div>
+          <h2>Welcome back</h2>
+          <p>Sign in to your Wayfarer Rewards account.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:14 }}>
+          {/* Email field */}
+          <div className="si-field">
+            <input
+              id="si-email"
+              type="email"
+              required
+              autoFocus
+              autoComplete="email"
+              placeholder="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            <label htmlFor="si-email">Email address</label>
+            <span className="si-field-ico"><Ico name="user" size={16}/></span>
+          </div>
+
+          {/* Password field */}
+          <div className="si-field">
+            <input
+              id="si-password"
+              type={showPw ? 'text' : 'password'}
+              required
+              autoComplete="current-password"
+              placeholder="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              style={{ paddingRight: 44 }}
+            />
+            <label htmlFor="si-password">Password</label>
+            <span className="si-field-ico"><Ico name="lock" size={16}/></span>
+            <button type="button" className="si-eye" onClick={() => setShowPw(v => !v)} tabIndex={-1} aria-label="Toggle password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                {showPw
+                  ? <><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20C5 20 1 12 1 12a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></>
+                  : <><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></>
+                }
+              </svg>
+            </button>
+          </div>
+
+          <div style={{ textAlign:'right', marginTop:-4 }}>
+            <a href="#" onClick={e => e.preventDefault()} style={{ fontSize:13, color:'var(--accent)', textDecoration:'none', fontWeight:500 }}>Forgot password?</a>
+          </div>
+
+          <button type="submit" className="si-submit">
+            Sign in
+            <Ico name="arrow" size={16}/>
+          </button>
+        </form>
+
+        <div className="si-foot" style={{ marginTop:20 }}>
+          Don&apos;t have an account?{' '}
+          <a href="#" onClick={(e) => { e.preventDefault(); onSignIn({ firstName: 'Aarav', lastName: 'Menon', email: email || 'aarav@example.com' }); }}>
+            Create one
+          </a>
+        </div>
+
+        <div className="si-trust">
+          <Ico name="shield" size={12}/>
+          SSL secured · Your data is never shared
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "accentHue": 202,
-  "showHeroGlow": true,
-  "imageStyle": "stripes",
-  "buttonShape": "pill",
-  "density": "comfortable"
+  "buttonShape": "pill"
 }/*EDITMODE-END*/;
 
 function App() {
@@ -74,17 +254,16 @@ function App() {
       guests: ctx.guests,
       total: ctx.total,
       form: ctx.form,
-      status: 'PENDING_APPROVAL',
+      state: 'awaiting',
     };
     setActiveBooking(newBooking);
     go('flow');
   };
 
-  const advance = (status) => {
+  const advance = (newState) => {
     setActiveBooking(b => {
-      const next = { ...b, status };
-      if (status === 'CONFIRMED') {
-        // add to bookings list
+      const next = { ...b, state: newState };
+      if (newState === 'confirmed') {
         setBookings(prev => [{
           id: next.id,
           property: next.property.name,
@@ -95,7 +274,7 @@ function App() {
           nights: tt.nightsBetween(next.checkIn, next.checkOut),
           guests: 2,
           total: next.total,
-          status: 'CONFIRMED',
+          state: 'confirmed',
         }, ...prev]);
       }
       return next;
@@ -146,7 +325,7 @@ function App() {
               guests: '2 guests · 1 room',
               total: 35400,
               form: { firstName:'Aarav', lastName:'Menon', email:'aarav@example.com' },
-              status: 'APPROVED',
+              state: 'approved',
             };
             setActiveBooking(demo); go('flow');
           }}>Jump to payment screen</TweakButton>
@@ -159,12 +338,5 @@ function App() {
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 
-<template id="__bundler_thumbnail">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" fill="#0071e3"/>
-  <path d="M50 28 L72 72 L28 72 Z" fill="#fff" opacity="0.95"/>
-  <circle cx="50" cy="58" r="6" fill="#0071e3"/>
-</svg>
-</template>
 </body>
 </html>
